@@ -1,16 +1,14 @@
-// Ursprüngliche Quelle:
-// Production 17 Function DCC Decoder   Dec_17LED_1Ftn.ino
-// Version 6.01  Geoff Bunza 2014,2015,2016,2017,2018
-//
-
 /* Multifunktionsdekoder für Waggonlicht, dimmbar per CV
   DEFAULT-Einstellungen (nach factory reset)
 ---------------------------------------------
-   Das Schlussignal wird eingeschaltet, wenn die Fahrtrichtung "Vorwärts" ist und F0 aktiv
-   F8 schaltet den Ausgang 0 unabhängig von der Fahrtrichtung
-   Mit F9 und F10 können zwei weitere Lichtgruppen geschaltet werden
+   F0 vorwärts schaltet Port B0
+   F0 rückwärts schaltet Port B1
+   F1 schaltet Port B4 
 
-Programmierung via Programmiergleis oder POM
+Jede Funktion von F0 .. F12 kann einem der drei Ausgänge zugeordnet werden
+Jede Funktion kann einen PWM-Wert aktivieren
+
+Programmierung ist möglich via Programmiergleis oder POM
 */
 
 /*
@@ -19,13 +17,20 @@ Programmierung via Programmiergleis oder POM
               |                    |   Pin             
          |-----                [ ] |    5  PB5  --- 10kOhm --> VCC
          | [-]    ATtiny85     [ ] |    4  PB4  F10
-    USB  | [ ]                 [ ] |    3  PB3  Ack  --> 470 Ohm -> PNP Basis, Emitter GND, Collector + 100 Ohm zwischen VCC/GND
-         | [ ]                 [ ] |    2  PB2  DCC Signal Eingang 
+    USB  | [ ]                 [ ] |    3  PB3  Ack  --> 470 Ohm -> PNP Basis, Emitter GND, Collector + 100 Ohm zwischen Vin/GND
+         | [ ]                 [ ] |    2  PB2  DCC Signal Eingang --> 22kOhm --> Track B
          | [+]                 [ ] |    1  PB1  F9  
          |-----                [ ] |    0  PB0  F0  
               |  [ ] [ ] [ ]    [+]|                
               +--------------------+                
-                +5V GND  Vin                        
+                +5V GND  Vin  ------> Graetzbrücke +
+                 |   |
+                 |   +--------------> Graetzbrücke -
+                 +------------------> Supercap 0.047mF/5.4V +
+                     
+
+            Track A ----------------> Graetzbrücke ~
+            Track B ----------------> Graetzbrücke ~
 */
 
 /* CV-Plan für die "herstellereigenen"  CVs:
@@ -33,9 +38,18 @@ Programmierung via Programmiergleis oder POM
 +-----+-----------------------------------------------------------------
 |  33 |  Ausgang F0v (Spitzensignal) aktiv                  |  1 (PORT B0)
 |  34 |  Ausgang F0r (Schlusssignal) aktiv                  |  2 (PORT B1)
-|  42 |  Ausgang F8 aktiv                                   |  0 (PORT B4)
-|  43 |  Ausgang F9 aktiv                                   |  1
-|  44 |  Ausgang F10 aktiv                                  |  1
+|  35 |  Ausgang F1                                         |  16 (PORT B4)
+|  36 |  Ausgang F2                                         |  0 (kann Wert 1 = Port B0, 2 = Port B1 oder 16 = Port B4 annehmen
+|  37 |  Ausgang F3                                         |  0
+|  38 |  Ausgang F4                                         |  0
+|  39 |  Ausgang F5                                         |  0
+|  40 |  Ausgang F6                                         |  0
+|  41 |  Ausgang F7                                         |  0
+|  42 |  Ausgang F8                                         |  0
+|  43 |  Ausgang F9                                         |  0
+|  44 |  Ausgang F10                                        |  0
+|  45 |  Ausgang F11                                        |  0
+|  46 |  Ausgang F12                                        |  0
 +-----+-----------------------------------------------------------------
 | 112 |  PWM Ausgang F0v                                    |  255
 | 113 |  PWM Ausgang F0r                                    |  255
