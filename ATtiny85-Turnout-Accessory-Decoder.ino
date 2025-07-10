@@ -1,7 +1,5 @@
 #include <NmraDcc.h>
 
-// It responds to both the normal DCC Turnout Control packets and the newer DCC Signal Aspect packets
-// You can also print every DCC packet by uncommenting the "#define NOTIFY_DCC_MSG" line below
 // per PWM können drei Weichen bedient werden
 // PWM muss manuell erzeugt werden im Bereich
 // für SG90: 50 Hz, 500 µs für 0 ° bis 2400 µs für 180 °
